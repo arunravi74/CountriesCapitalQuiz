@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="col-lg-8 border border-success p-4 m-4 mx-auto h-50 ">
+    <div style="min-height:200px">
+        <h4>
+            What is the captial of <b>{{name.name}}?</b>
+        </h4>
+            <form id="capital-form">
+                {% csrf_token %}
+                <input type="hidden" id="capitalobj" name="capitalobj" value ="{{name.name}}">
+                <br>
+                <input type="text" id="answer" name="name">
+                <br>
+                <br>
+                <input type="submit" class="btn btn-primary" value="CHECK" />
+            </form>
+            <h5 class="alert-success"></h5>
+    </div>
+    <div style="display:flex;justify-content:space-between"> 
+        <a href="{% url 'index' %}" style="margin-left: 0px;">
+            <button class="btn btn-primary mb-1 float-right">
+                EXIT
+            </button>
+        </a>
+        <a href="{% url 'home' %}"style="margin-right: 0px;">
+            <button class="btn btn-primary mb-1 float-right">
+                NEXT
+            </button>
+        </a>
+        
+    </div>
+</div>
+
+
+<script>
+function resetForm() 
+{
+	$('#capital-form')[0].reset();
+}
+$(document).on('submit','#capital-form',function(e){
+    // preventing from page reload and default actions
+    e.preventDefault();
+    // serialize the data for sending the form data.
+    // make POST ajax call
+    $.ajax({
+        type:'POST',
+        url: "{% url 'answer-view' %}",
+        data: {
+            capitalobj:$('#capitalobj').val(),
+            name:$('#answer').val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function (data) {
+            if(data==="Correct Answer"){
+                $('h5').html(data).css("color", "Green");
+            
+            } 
+            else{
+                $('h5').html(data).css("color", "red");
+            }    
+            resetForm();
+        },
+    });
+});
+</script>
+{% endblock %}
